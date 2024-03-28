@@ -1,44 +1,65 @@
-require('dotenv').config()
-const express = require('express')
+
 const connectToDB = require("./config/db.js");
-const Client = require("./models/client.js")
+const Client = require("./models/client.js");
+require('dotenv').config();
+
+const express = require("express");
+const { res } = require("express");
+const app = express();
+app.get('/', function(req, res, next) {
+    res.send("Hello world");
+});
+
+app.get("/user",)
+
+app.post("/action",(res,req)=>{
+    const userData = {
+        name: req.body.name,
+        password: req.body.password,
+    }
+    res.send(userData)
+})
 
 
-const app = express()
-app.use(express.json())
-console.log(Client)
-
-app.get("/api/v1/login", (req,res)=>{
+app.post("/api/v1/login", (req,res)=>{
     const client = new Client({
-        clientEmail: req.body.clientEmail,
-        clientPassword: req.body.clientPassword,
+        clientEmail: req.body.email,
+        clientPassword: req.body.password,
     });
     client.save();
-    console.log(req.body);
-    res.send(req.body);
-
+    console.log(res.body);
+    res.send(res.body);
 })
 
-app.get("/api/v1/list",async (req,res)=>{
-    const {list} = req.query;
+app.post("/api/image/generate", async(req,res)=>{
+    const word = req.query;
 
-    // try{
-    //     if(!list) {
-    //         throw new Error("List is missing")
-    //     }
+    try{
+        if(!word){
+            throw new Error("word parameter is missing")
+        }
 
-    //     const response = await fetch(``);
+        const response = await fetch(
+            "http://172.16.50.58:5000/api/image/generate"
+        );
+        const word = await response.json();
 
-    //     const data = await response.json();
+        const formattedData = filteredData.map((generate)=>{
+            prompt: req.body.generate
+        })
+        res.json(formattedData);
+    }catch(error) {
+        res.status(400).json({error: error.message})
+    }
 
-    //     const formattedData = data.
-    // }
+    
+});
 
 
-})
 
 connectToDB()
 
-app.listen(process.env.PORT || 8000, () => {
-    console.log("Server is tuning on http://localhost:3000/ ");
-  });
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log("server is runing on port " + PORT);
+});
